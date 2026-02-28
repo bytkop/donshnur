@@ -2,14 +2,14 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Доншнур</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0b0d0e; --card-bg: rgba(26, 29, 33, 0.9); --text-main: #ffffff;
             --text-gray: #9ca3af; --nav-border: rgba(255,255,255,0.1); --input-bg: rgba(255,255,255,0.05);
-            --accent: #ffffff; --btn-text: #000000; --transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+            --accent: #ffffff; --btn-text: #000000; --transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
         }
         [data-theme="light"] {
             --bg: #f0f2f5; --card-bg: rgba(255, 255, 255, 0.95); --text-main: #1a1d21;
@@ -17,94 +17,92 @@
             --accent: #1a1d21; --btn-text: #ffffff;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: var(--text-main); transition: var(--transition); min-height: 100vh; overflow: hidden; }
         body.allow-scroll { overflow-y: auto; }
-        .no-select { user-select: none; -webkit-user-select: none; }
-
+        
         #neural-canvas { position: fixed; inset: 0; z-index: -1; opacity: 0.3; }
 
-        .theme-toggle {
-            position: fixed; bottom: 25px; left: 25px; width: 50px; height: 50px;
-            background: var(--card-bg); border: 1px solid var(--nav-border);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 6000; font-size: 1.2rem;
-        }
-
-        /* LOGIN */
-        #login-screen { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; background: var(--bg); }
-        .brand-name { font-size: 3.5rem; font-weight: 800; margin-bottom: 20px; letter-spacing: -2px; }
-        .login-frame { background: var(--card-bg); padding: 40px; border-radius: 32px; width: 380px; border: 1px solid var(--nav-border); text-align: center; }
-
         /* NAV */
-        nav { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; border-bottom: 1px solid var(--nav-border); background: var(--card-bg); position: sticky; top: 0; z-index: 1000; }
-        .nav-links { display: flex; gap: 20px; list-style: none; }
-        .nav-links li { cursor: pointer; color: var(--text-gray); font-weight: 600; transition: var(--transition); font-size: 0.9rem; }
-        .nav-links li.active { color: var(--text-main); }
+        nav { min-height: 70px; display: flex; flex-direction: column; align-items: center; padding: 15px 5%; border-bottom: 1px solid var(--nav-border); background: var(--card-bg); position: sticky; top: 0; z-index: 1000; }
+        .nav-links { display: flex; gap: 8px; list-style: none; margin-top: 10px; flex-wrap: wrap; justify-content: center; }
+        .nav-links li { cursor: pointer; color: var(--text-gray); font-weight: 600; font-size: 0.75rem; padding: 8px 10px; border-radius: 10px; transition: var(--transition); }
+        .nav-links li.active { color: var(--text-main); background: var(--input-bg); }
 
-        .container { padding: 30px 5%; max-width: 1200px; margin: 0 auto; }
+        .logout-btn { position: absolute; right: 20px; top: 20px; cursor: pointer; font-size: 0.8rem; font-weight: 700; color: #ef4444; background: var(--input-bg); padding: 5px 12px; border-radius: 8px; border: 1px solid var(--nav-border); }
+
+        /* GRID & CARDS */
+        .container { padding: 20px 5%; max-width: 1200px; margin: 0 auto; }
         .page { display: none; opacity: 0; transform: translateY(10px); transition: var(--transition); }
         .page.active { display: block; opacity: 1; transform: translateY(0); }
+        
+        .report-card { background: var(--card-bg); padding: 20px; border-radius: 22px; margin-bottom: 15px; border: 1px solid var(--nav-border); position: relative; }
+        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        @media (min-width: 1000px) { .portfolio-grid { grid-template-columns: repeat(3, 1fr); padding: 10px 60px; } }
+        
+        .portfolio-card { background: var(--card-bg); border-radius: 20px; overflow: hidden; border: 1px solid var(--nav-border); }
+        .portfolio-media { width: 100%; aspect-ratio: 1/1; object-fit: cover; cursor: pointer; display: block; }
 
-        /* REPORTS */
-        .report-card { background: var(--card-bg); padding: 25px; border-radius: 22px; margin-bottom: 15px; border: 1px solid var(--nav-border); position: relative; }
-        .delete-btn { position: absolute; bottom: 15px; right: 20px; cursor: pointer; opacity: 0.5; transition: 0.2s; }
-        .delete-btn:hover { opacity: 1; color: #ef4444; }
+        .file-attach { display: block; margin-top: 10px; color: #3b82f6; cursor: pointer; font-size: 0.8rem; text-decoration: underline; }
 
-        /* MODAL */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 4500; }
+        /* UI ELEMENTS */
+        .btn { padding: 14px 20px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; transition: var(--transition); width: 100%; }
+        .btn-publish { background: var(--accent); color: var(--btn-text); }
+        .input-field { width:100%; padding:14px; margin:8px 0 16px; border-radius:12px; background:var(--input-bg); border:1px solid var(--nav-border); color:var(--text-main); outline: none; }
+        
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); display: none; align-items: center; justify-content: center; z-index: 9000; padding: 20px; }
         .modal-overlay.active { display: flex; }
 
-        .btn { padding: 12px 20px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: var(--transition); }
-        .btn-publish { background: var(--accent); color: var(--btn-text); }
-        .btn-outline { background: var(--input-bg); color: var(--text-main); border: 1px solid var(--nav-border); }
-
-        /* PROFILE SPECIFIC */
-        .avatar-container { width:120px; height:120px; border-radius:50%; background:var(--input-bg); margin: 0 auto 20px; display:flex; align-items:center; justify-content:center; border:2px dashed var(--nav-border); overflow:hidden; position: relative; cursor: pointer; }
-        .avatar-container img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-card { background: var(--card-bg); padding: 40px; border-radius: 30px; border: 1px solid var(--nav-border); max-width: 500px; margin: 0 auto; text-align:center; }
-        .input-field { width:100%; padding:12px; margin:8px 0 18px; border-radius:12px; background:var(--input-bg); border:1px solid var(--nav-border); color:var(--text-main); outline: none; }
-
-        /* CALC */
-        .calc-box { max-width: 350px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 28px; border: 1px solid var(--nav-border); }
-        .calc-display { width: 100%; padding: 20px; background: var(--input-bg); border-radius: 15px; text-align: right; font-size: 1.8rem; margin-bottom: 15px; border: 1px solid var(--nav-border); min-height: 80px; }
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .calc-btn { padding: 18px; border-radius: 12px; border: none; background: var(--input-bg); color: var(--text-main); font-weight: 700; cursor: pointer; }
+        .avatar-box { width: 100px; height: 100px; border-radius: 50%; background: var(--input-bg); margin: 0 auto 15px; overflow: hidden; border: 2px dashed var(--nav-border); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .avatar-box img { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
-<body data-theme="dark" class="no-select">
+<body data-theme="dark">
 
 <canvas id="neural-canvas"></canvas>
-<div class="theme-toggle" onclick="toggleTheme()" id="t-btn">🌙</div>
+<div id="lightbox" style="position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:10000; display:none; align-items:center; justify-content:center;" onclick="this.style.display='none'"></div>
+<div class="theme-toggle" onclick="toggleTheme()" id="t-btn" style="position:fixed; bottom:20px; left:20px; width:45px; height:45px; background:var(--card-bg); border:1px solid var(--nav-border); border-radius:50%; display:flex; align-items:center; justify-content:center; z-index:7000; cursor:pointer;">🌙</div>
 
-<div id="login-screen">
-    <h1 class="brand-name">Доншнур</h1>
-    <div class="login-frame">
-        <input type="password" id="login-input" placeholder="Логин" style="width:100%; padding:16px; border-radius:14px; background:var(--input-bg); color:var(--text-main); border:1px solid var(--nav-border); margin-bottom:20px; text-align:center; outline:none;">
-        <button class="btn btn-publish" style="width: 100%;" onclick="tryLogin()">Войти</button>
+<div id="login-screen" style="position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:8000; background:var(--bg);">
+    <h1 style="font-size: 3rem; font-weight: 800; margin-bottom: 20px;">Доншнур</h1>
+    <div style="background: var(--card-bg); padding: 30px; border-radius: 30px; border: 1px solid var(--nav-border); width: 90%; max-width: 350px; text-align: center;">
+        <input type="password" id="login-input" placeholder="ID сотрудника" class="input-field" style="text-align:center;">
+        <button class="btn btn-publish" onclick="tryLogin()">Войти</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="exit-modal">
+    <div style="background:var(--card-bg); padding:30px; border-radius:25px; text-align:center; border:1px solid var(--nav-border); max-width:320px;">
+        <h3 style="margin-bottom:20px;">Вы точно хотите выйти из системы?</h3>
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-publish" onclick="logout()">Да</button>
+            <button class="btn" style="background:var(--input-bg); color:var(--text-main);" onclick="closeModal('exit-modal')">Нет</button>
+        </div>
     </div>
 </div>
 
 <div class="modal-overlay" id="report-modal">
-    <div style="background: var(--card-bg); padding: 30px; border-radius: 28px; width: 90%; max-width: 500px; border: 1px solid var(--nav-border);">
-        <h2>Новый отчет</h2>
-        <textarea id="report-text" placeholder="Описание работы..." style="width:100%; height:150px; margin:15px 0; background:var(--input-bg); border:1px solid var(--nav-border); color:var(--text-main); padding:15px; border-radius:12px; resize:none; outline:none;"></textarea>
-        <input type="file" id="file-input" hidden onchange="updateFileName()">
-        <button class="btn btn-outline" style="width:100%; margin-bottom:15px;" onclick="document.getElementById('file-input').click()">📎 Прикрепить документ</button>
-        <div id="file-name-display" style="font-size:0.8rem; color:var(--text-gray); margin-bottom:10px; text-align: center;"></div>
+    <div style="background:var(--card-bg); padding:25px; border-radius:25px; width:100%; max-width:450px; border:1px solid var(--nav-border);">
+        <h2 id="modal-title" style="margin-bottom:15px;">Новый отчет</h2>
+        <textarea id="report-text" placeholder="Текст отчета..." class="input-field" style="height:120px; resize:none;"></textarea>
+        <input type="file" id="report-file" hidden onchange="document.getElementById('r-fn').innerText=this.files[0].name">
+        <button class="btn" style="background:var(--input-bg); color:var(--text-main); margin-bottom:10px;" onclick="document.getElementById('report-file').click()">📎 Прикрепить файл</button>
+        <div id="r-fn" style="font-size:0.7rem; margin-bottom:10px;"></div>
         <div style="display:flex; gap:10px;">
-            <button class="btn btn-outline" style="flex:1" onclick="closeModal()">Отмена</button>
-            <button class="btn btn-publish" style="flex:1" onclick="saveReport()">Опубликовать</button>
+            <button class="btn" style="background:var(--input-bg); color:var(--text-main);" onclick="closeModal('report-modal')">Отмена</button>
+            <button class="btn btn-publish" onclick="saveReport()">Отправить</button>
         </div>
     </div>
 </div>
 
 <div id="main-interface" style="display:none;">
     <nav>
-        <div style="font-weight: 800; font-size: 1.2rem;">Доншнур</div>
+        <div class="logout-btn" onclick="openModal('exit-modal')">Выход</div>
+        <div style="font-weight: 800; font-size: 1.1rem;">ДОНШНУР</div>
         <ul class="nav-links">
             <li id="li-worker" onclick="showTab('worker')">Работники</li>
             <li id="li-acc" onclick="showTab('acc')">Бухгалтерия</li>
+            <li id="li-portfolio" onclick="showTab('portfolio')">Портфолио</li>
             <li id="li-calc" onclick="showTab('calc')">Калькулятор</li>
             <li id="li-notes" onclick="showTab('notes')">Заметки</li>
             <li id="li-profile" onclick="showTab('profile')">Профиль</li>
@@ -113,75 +111,78 @@
 
     <div class="container">
         <div id="section-reports" class="page">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-                <h1 id="page-title">Отчеты</h1>
-                <button class="btn btn-publish" onclick="openModal()">Создать отчет</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h1 id="rep-title" style="font-size: 1.3rem;">Отчеты</h1>
+                <button class="btn btn-publish" style="width:auto; padding: 10px 20px;" onclick="openModal('report-modal')">Создать</button>
             </div>
-            <div id="list-container"></div>
+            <div id="list-reports"></div>
         </div>
 
-        <div id="section-notes" class="page">
-            <h1>Личные заметки</h1>
-            <textarea id="my-notes" oninput="saveNotesLocal()" style="width:100%; height:calc(100vh - 250px); margin-top:20px; background:var(--card-bg); color:var(--text-main); border-radius:20px; padding:25px; border:1px solid var(--nav-border); resize:none; outline:none; font-size:1.1rem;"></textarea>
+        <div id="section-portfolio" class="page">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h1 style="font-size: 1.3rem;">Портфолио</h1>
+                <button class="btn btn-publish" style="width:auto; padding: 10px 20px;" onclick="openModal('port-modal')">Загрузить</button>
+            </div>
+            <div id="list-portfolio" class="portfolio-grid"></div>
+        </div>
+
+        <div class="modal-overlay" id="port-modal">
+            <div style="background:var(--card-bg); padding:25px; border-radius:25px; width:100%; max-width:450px; border:1px solid var(--nav-border);">
+                <h2>Новый пост</h2>
+                <textarea id="port-desc" placeholder="Описание (необязательно)..." class="input-field" style="height:80px; resize:none;"></textarea>
+                <input type="file" id="port-file" hidden accept="image/*,video/*,.heic" onchange="document.getElementById('p-fn').innerText=this.files[0].name">
+                <button class="btn" style="background:var(--input-bg); color:var(--text-main); margin-bottom:10px;" onclick="document.getElementById('port-file').click()">📎 Выбрать медиа</button>
+                <div id="p-fn" style="font-size:0.7rem; margin-bottom:10px;"></div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn" style="background:var(--input-bg); color:var(--text-main);" onclick="closeModal('port-modal')">Отмена</button>
+                    <button class="btn btn-publish" onclick="savePortfolio()">Выложить</button>
+                </div>
+            </div>
         </div>
 
         <div id="section-calc" class="page">
-            <div class="calc-box">
-                <div class="calc-display" id="calc-res">0</div>
-                <div class="calc-grid">
-                    <button class="calc-btn" onclick="calcInput('7')">7</button>
-                    <button class="calc-btn" onclick="calcInput('8')">8</button>
-                    <button class="calc-btn" onclick="calcInput('9')">9</button>
-                    <button class="calc-btn" style="color:#3b82f6" onclick="calcInput('/')">÷</button>
-                    <button class="calc-btn" onclick="calcInput('4')">4</button>
-                    <button class="calc-btn" onclick="calcInput('5')">5</button>
-                    <button class="calc-btn" onclick="calcInput('6')">6</button>
-                    <button class="calc-btn" style="color:#3b82f6" onclick="calcInput('*')">×</button>
-                    <button class="calc-btn" onclick="calcInput('1')">1</button>
-                    <button class="calc-btn" onclick="calcInput('2')">2</button>
-                    <button class="calc-btn" onclick="calcInput('3')">3</button>
-                    <button class="calc-btn" style="color:#3b82f6" onclick="calcInput('-')">-</button>
-                    <button class="calc-btn" style="color:#ef4444" onclick="calcClear()">C</button>
-                    <button class="calc-btn" onclick="calcInput('0')">0</button>
-                    <button class="calc-btn" style="background:var(--accent); color:var(--btn-text)" onclick="calculate()">=</button>
-                    <button class="calc-btn" style="color:#3b82f6" onclick="calcInput('+')">+</button>
+            <div style="max-width:320px; margin:0 auto; background:var(--card-bg); padding:20px; border-radius:28px; border:1px solid var(--nav-border);">
+                <div id="calc-res" style="width:100%; padding:20px; background:var(--input-bg); border-radius:15px; text-align:right; font-size:1.5rem; margin-bottom:15px; min-height:70px;">0</div>
+                <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px;">
+                    <button class="btn" style="background:var(--input-bg); color:white" onclick="cInp('7')">7</button>
+                    <button class="btn" style="background:var(--input-bg); color:white" onclick="cInp('8')">8</button>
+                    <button class="btn" style="background:var(--input-bg); color:white" onclick="cInp('9')">9</button>
+                    <button class="btn" style="background:var(--input-bg); color:#3b82f6" onclick="cInp('/')">/</button>
+                    <button class="btn" style="background:var(--input-bg); color:white" onclick="cInp('4')">4</button>
+                    <button class="btn" style="background:var(--input-bg); color:white" onclick="cInp('5')">5</button>
+                    <button class="btn" style="background:var(--input-bg); color:white" onclick="cInp('6')">6</button>
+                    <button class="btn" style="background:var(--input-bg); color:#3b82f6" onclick="cInp('*')">*</button>
+                    <button class="btn" style="background:var(--input-bg); color:white" onclick="cInp('1')">1</button>
+                    <button class="btn" style="background:var(--input-bg); color:white" onclick="cInp('2')">2</button>
+                    <button class="btn" style="background:var(--input-bg); color:white" onclick="cInp('3')">3</button>
+                    <button class="btn" style="background:var(--input-bg); color:#3b82f6" onclick="cInp('-')">-</button>
+                    <button class="btn" style="background:var(--input-bg); color:red" onclick="cClr()">C</button>
+                    <button class="btn" style="background:var(--input-bg); color:white" onclick="cInp('0')">0</button>
+                    <button class="btn btn-publish" onclick="cRes()">=</button>
+                    <button class="btn" style="background:var(--input-bg); color:#3b82f6" onclick="cInp('+')">+</button>
                 </div>
             </div>
         </div>
 
+        <div id="section-notes" class="page">
+            <textarea id="notes-area" oninput="localStorage.setItem('notes_data', this.value)" placeholder="Личные заметки..." class="input-field" style="height:calc(100vh - 220px); resize:none;"></textarea>
+        </div>
+
         <div id="section-profile" class="page">
-            <div class="profile-card">
-                <div class="avatar-container" onclick="document.getElementById('avatar-input').click()">
+            <div style="background:var(--card-bg); padding:30px; border-radius:30px; border:1px solid var(--nav-border); text-align:center; max-width:400px; margin:0 auto;">
+                <div class="avatar-box" onclick="document.getElementById('avatar-input').click()">
                     <img id="avatar-img" src="" style="display:none;">
-                    <span id="avatar-pl">➕</span>
+                    <span id="avatar-pl">👤</span>
                 </div>
-                <input type="file" id="avatar-input" hidden accept="image/*" onchange="loadAvatar(event)">
-                
-                <div id="profile-view-mode">
-                    <div style="display:flex; align-items:center; justify-content:center; margin-bottom:5px;">
-                        <h2 id="display-name">Артем Д.</h2>
-                        <span style="margin-left:12px; cursor:pointer; font-size: 1.1rem;" onclick="enableEditName()">✏️</span>
-                    </div>
-                    <p style="color:var(--text-gray); font-weight:600; margin-bottom:30px;">Сис-админ</p>
-                </div>
-
-                <div id="profile-edit-mode" style="display:none; margin-bottom: 25px;">
-                    <input type="text" id="edit-name-input" class="input-field" style="text-align: center; font-weight: bold; font-size: 1.2rem;">
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn btn-outline" style="flex:1" onclick="disableEditName()">Отмена</button>
-                        <button class="btn btn-publish" style="flex:1" onclick="saveName()">Сохранить</button>
-                    </div>
-                </div>
-
-                <div style="text-align:left; border-top: 1px solid var(--nav-border); padding-top: 25px;">
-                    <label style="color:var(--text-gray); font-size:0.8rem; font-weight: 600;">ТЕЛЕФОН</label>
-                    <input type="text" id="p-phone" class="input-field" placeholder="+7 (___) ___-__-__">
-                    <label style="color:var(--text-gray); font-size:0.8rem; font-weight: 600;">EMAIL</label>
-                    <input type="text" id="p-email" class="input-field" placeholder="example@mail.com">
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn btn-outline" style="flex:1" onclick="resetContacts()">Отмена</button>
-                        <button class="btn btn-publish" style="flex:1" onclick="saveContacts()">Сохранить контакты</button>
-                    </div>
+                <input type="file" id="avatar-input" hidden accept="image/*,.heic" onchange="loadAvatar(event)">
+                <h2 id="p-name" style="margin-bottom:5px;"></h2>
+                <p id="p-role" style="color:var(--text-gray); font-size:0.9rem; font-weight:600; margin-bottom:20px;"></p>
+                <div style="text-align:left; border-top:1px solid var(--nav-border); padding-top:20px;">
+                    <label style="font-size:0.7rem; color:var(--text-gray)">ТЕЛЕФОН</label>
+                    <input type="text" id="phone-inp" class="input-field">
+                    <label style="font-size:0.7rem; color:var(--text-gray)">EMAIL</label>
+                    <input type="text" id="email-inp" class="input-field">
+                    <button class="btn btn-publish" onclick="saveProfileData()">Сохранить данные</button>
                 </div>
             </div>
         </div>
@@ -189,164 +190,170 @@
 </div>
 
 <script>
-    let user = { 
-        id: "idDrbot", 
-        name: localStorage.getItem('u_name') || "Артем Д.", 
-        role: "Сис-админ" 
+    const users = {
+        "idDrbot": { name: "Артем Д.", role: "Сис-админ" },
+        "idMarinaD": { name: "Марина Д.", role: "Директор" },
+        "idNataliaL": { name: "Наталья Л.", role: "Ген. Директор" },
+        "idAndreyP": { name: "Андрей П.", role: "Работник" }
     };
-    let reports = JSON.parse(localStorage.getItem('reports') || '[]');
+
+    let currentUser = null;
+    let reports = JSON.parse(localStorage.getItem('rep_db_v2') || '[]');
+    let portfolio = JSON.parse(localStorage.getItem('port_db_v2') || '[]');
     let currentTab = 'worker';
 
     function tryLogin() {
-        if(document.getElementById('login-input').value === user.id) {
+        const id = document.getElementById('login-input').value;
+        if(users[id]) {
+            currentUser = { ...users[id], id: id };
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('main-interface').style.display = 'block';
-            document.getElementById('my-notes').value = localStorage.getItem('notes') || '';
-            document.getElementById('display-name').innerText = user.name;
+            document.getElementById('p-name').innerText = currentUser.name;
+            document.getElementById('p-role').innerText = currentUser.role;
             
-            // Загрузка аватара
-            const savedAvatar = localStorage.getItem('u_avatar');
-            if(savedAvatar) {
-                const img = document.getElementById('avatar-img');
-                img.src = savedAvatar;
-                img.style.display = 'block';
-                document.getElementById('avatar-pl').style.display = 'none';
-            }
-
-            resetContacts();
+            const av = localStorage.getItem('u_avatar_'+id);
+            if(av) { document.getElementById('avatar-img').src = av; document.getElementById('avatar-img').style.display='block'; document.getElementById('avatar-pl').style.display='none'; }
+            else { document.getElementById('avatar-img').style.display='none'; document.getElementById('avatar-pl').style.display='flex'; }
+            
+            document.getElementById('phone-inp').value = localStorage.getItem('u_phone_'+id) || '';
+            document.getElementById('email-inp').value = localStorage.getItem('u_email_'+id) || '';
             showTab('worker');
-        }
+        } else alert("Ошибка входа");
     }
+
+    function logout() { location.reload(); }
 
     function showTab(tab) {
         currentTab = tab;
-        document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+        document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display='none'; });
         document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
+        document.body.classList.add('allow-scroll');
+        const sid = (tab==='worker'||tab==='acc') ? 'section-reports' : 'section-'+tab;
+        document.getElementById(sid).style.display = 'block';
+        setTimeout(()=>document.getElementById(sid).classList.add('active'), 50);
+        document.getElementById('li-'+tab).classList.add('active');
+        if(tab==='worker'||tab==='acc') { document.getElementById('rep-title').innerText = tab==='worker'?"Отчеты работников":"Отчеты бухгалтерии"; renderReports(); }
+        if(tab==='portfolio') renderPortfolio();
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    function saveReport() {
+        const txt = document.getElementById('report-text').value;
+        const file = document.getElementById('report-file').files[0];
+        if(!txt && !file) return;
         
-        if(tab === 'worker' || tab === 'acc') document.body.classList.add('allow-scroll');
-        else { document.body.classList.remove('allow-scroll'); window.scrollTo(0,0); }
+        const process = (fileData) => {
+            reports.push({
+                id: Date.now(), author: currentUser.name, authorId: currentUser.id,
+                text: txt, type: currentTab, date: new Date().toLocaleString(),
+                fileName: file ? file.name : null, fileData: fileData
+            });
+            localStorage.setItem('rep_db_v2', JSON.stringify(reports));
+            document.getElementById('report-text').value = '';
+            document.getElementById('report-file').value = '';
+            document.getElementById('r-fn').innerText = '';
+            closeModal('report-modal'); renderReports();
+        };
 
-        const sectionId = (tab === 'worker' || tab === 'acc') ? 'section-reports' : 'section-' + tab;
-        const page = document.getElementById(sectionId);
-        page.style.display = 'block';
-        setTimeout(() => page.classList.add('active'), 50);
-        document.getElementById('li-' + tab).classList.add('active');
-
-        if(tab === 'worker' || tab === 'acc') {
-            document.getElementById('page-title').innerText = tab === 'worker' ? "Отчеты работников" : "Отчеты бухгалтеров";
-            renderReports();
-        }
+        if(file) {
+            const r = new FileReader();
+            r.onload = (e) => process(e.target.result);
+            r.readAsDataURL(file);
+        } else process(null);
     }
 
-    // PROFILE LOGIC
-    function enableEditName() {
-        document.getElementById('profile-view-mode').style.display = 'none';
-        document.getElementById('profile-edit-mode').style.display = 'block';
-        document.getElementById('edit-name-input').value = user.name;
+    function renderReports() {
+        const cont = document.getElementById('list-reports');
+        cont.innerHTML = '';
+        reports.filter(r => r.type === currentTab).reverse().forEach(r => {
+            cont.innerHTML += `
+                <div class="report-card">
+                    <div style="font-weight:700">${r.author}</div>
+                    <div style="font-size:0.7rem; color:var(--text-gray); margin-bottom:10px">${r.date}</div>
+                    <div>${r.text}</div>
+                    ${r.fileData ? `<span class="file-attach" onclick="downloadFile('${r.fileData}', '${r.fileName}')">📎 ${r.fileName}</span>` : ''}
+                    ${r.authorId === currentUser.id ? `<span style="position:absolute; bottom:15px; right:20px; cursor:pointer; opacity:0.3" onclick="delRep(${r.id})">🗑️</span>` : ''}
+                </div>`;
+        });
     }
 
-    function disableEditName() {
-        document.getElementById('profile-view-mode').style.display = 'block';
-        document.getElementById('profile-edit-mode').style.display = 'none';
+    function downloadFile(data, name) {
+        const a = document.createElement('a'); a.href = data; a.download = name; a.click();
     }
 
-    function saveName() {
-        const newName = document.getElementById('edit-name-input').value;
-        if(newName.trim() === "") return;
-        user.name = newName;
-        localStorage.setItem('u_name', newName);
-        document.getElementById('display-name').innerText = newName;
-        disableEditName();
-        renderReports();
+    function savePortfolio() {
+        const f = document.getElementById('port-file').files[0];
+        if(!f) return alert("Выберите файл");
+        const r = new FileReader();
+        r.onload = (e) => {
+            portfolio.push({
+                id: Date.now(), authorId: currentUser.id, author: currentUser.name,
+                desc: document.getElementById('port-desc').value || "",
+                media: e.target.result, type: f.type.includes('video') ? 'video' : 'image', date: new Date().toLocaleString()
+            });
+            localStorage.setItem('port_db_v2', JSON.stringify(portfolio));
+            closeModal('port-modal'); renderPortfolio();
+        };
+        r.readAsDataURL(f);
     }
+
+    function renderPortfolio() {
+        const cont = document.getElementById('list-portfolio');
+        cont.innerHTML = '';
+        portfolio.slice().reverse().forEach(p => {
+            cont.innerHTML += `
+                <div class="portfolio-card">
+                    ${p.type==='video' ? `<video src="${p.media}" class="portfolio-media" controls></video>` : `<img src="${p.media}" class="portfolio-media" onclick="viewFull('${p.media}')">`}
+                    <div style="padding:15px">
+                        <p style="font-size:0.85rem">${p.desc}</p>
+                        <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:0.7rem; color:var(--text-gray)">
+                            <span>${p.author} • ${p.date}</span>
+                            ${p.authorId===currentUser.id ? `<span onclick="delPort(${p.id})" style="color:red; cursor:pointer">Удалить</span>` : ''}
+                        </div>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function viewFull(src) { const lb = document.getElementById('lightbox'); lb.innerHTML = `<img src="${src}" style="max-width:90%; max-height:90%;">`; lb.style.display = 'flex'; }
+    function delPort(id) { portfolio = portfolio.filter(p => p.id !== id); localStorage.setItem('port_db_v2', JSON.stringify(portfolio)); renderPortfolio(); }
+    function delRep(id) { reports = reports.filter(r => r.id !== id); localStorage.setItem('rep_db_v2', JSON.stringify(reports)); renderReports(); }
 
     function loadAvatar(e) {
-        const file = e.target.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-            const base64 = reader.result;
-            localStorage.setItem('u_avatar', base64);
-            const img = document.getElementById('avatar-img');
-            img.src = base64;
-            img.style.display = 'block';
-            document.getElementById('avatar-pl').style.display = 'none';
-        }
-        reader.readAsDataURL(file);
+        const r = new FileReader();
+        r.onload = () => {
+            localStorage.setItem('u_avatar_'+currentUser.id, r.result);
+            document.getElementById('avatar-img').src = r.result;
+            document.getElementById('avatar-img').style.display='block';
+            document.getElementById('avatar-pl').style.display='none';
+        };
+        r.readAsDataURL(e.target.files[0]);
     }
 
-    function saveContacts() {
-        localStorage.setItem('u_phone', document.getElementById('p-phone').value);
-        localStorage.setItem('u_email', document.getElementById('p-email').value);
-        alert("Контакты обновлены!");
+    function saveProfileData() {
+        localStorage.setItem('u_phone_'+currentUser.id, document.getElementById('phone-inp').value);
+        localStorage.setItem('u_email_'+currentUser.id, document.getElementById('email-inp').value);
+        alert("Сохранено");
     }
 
-    function resetContacts() {
-        document.getElementById('p-phone').value = localStorage.getItem('u_phone') || '';
-        document.getElementById('p-email').value = localStorage.getItem('u_email') || '';
-    }
+    let cVal = "";
+    function cInp(v) { cVal += v; document.getElementById('calc-res').innerText = cVal; }
+    function cClr() { cVal = ""; document.getElementById('calc-res').innerText = "0"; }
+    function cRes() { try { cVal = eval(cVal).toString(); document.getElementById('calc-res').innerText = cVal; } catch { cClr(); } }
 
-    // REPORTS LOGIC
-    function renderReports() {
-        const container = document.getElementById('list-container');
-        container.innerHTML = '';
-        const filtered = reports.filter(r => r.type === currentTab).reverse();
-        filtered.forEach(r => {
-            const card = document.createElement('div');
-            card.className = 'report-card';
-            card.innerHTML = `
-                <b>${r.authorId === user.id ? user.name : r.authorName}</b> <span style="font-size:0.75rem; color:var(--text-gray)">${r.date}</span>
-                <p style="margin-top:10px; line-height:1.5;">${r.content}</p>
-                ${r.fileName ? `<div style="color:#3b82f6; cursor:pointer; margin-top:10px; font-size:0.85rem;" onclick="dl('${r.fileName}')">📄 ${r.fileName}</div>` : ''}
-                ${(user.role === 'Сис-админ' || r.authorId === user.id) ? `<span class="delete-btn" onclick="delRep(${r.id})">🗑️</span>` : ''}
-            `;
-            container.appendChild(card);
-        });
-    }
-
-    function dl(n) { const a = document.createElement("a"); a.href = "#"; a.download = n; a.click(); }
-    function delRep(id) { reports = reports.filter(r => r.id !== id); localStorage.setItem('reports', JSON.stringify(reports)); renderReports(); }
-    function openModal() { document.getElementById('report-modal').classList.add('active'); }
-    function closeModal() { document.getElementById('report-modal').classList.remove('active'); }
-    function updateFileName() { const f = document.getElementById('file-input').files[0]; document.getElementById('file-name-display').innerText = f ? "Выбрано: " + f.name : ''; }
-    
-    function saveReport() {
-        const text = document.getElementById('report-text').value;
-        if(!text) return;
-        const file = document.getElementById('file-input').files[0];
-        reports.push({
-            id: Date.now(), authorId: user.id, authorName: user.name,
-            type: currentTab, content: text, date: new Date().toLocaleString(),
-            fileName: file ? file.name : null
-        });
-        localStorage.setItem('reports', JSON.stringify(reports));
-        document.getElementById('report-text').value = '';
-        closeModal();
-        renderReports();
-    }
-
-    function saveNotesLocal() { localStorage.setItem('notes', document.getElementById('my-notes').value); }
     function toggleTheme() {
-        const b = document.body;
-        const theme = b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        b.setAttribute('data-theme', theme);
-        document.getElementById('t-btn').innerText = theme === 'dark' ? '🌙' : '☀️';
+        const t = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.body.setAttribute('data-theme', t);
+        document.getElementById('t-btn').innerText = t === 'dark' ? '🌙' : '☀️';
     }
 
-    // CALC
-    let calcVal = "";
-    function calcInput(v) { calcVal += v; document.getElementById('calc-res').innerText = calcVal; }
-    function calcClear() { calcVal = ""; document.getElementById('calc-res').innerText = "0"; }
-    function calculate() { try { calcVal = eval(calcVal).toString(); document.getElementById('calc-res').innerText = calcVal; } catch { calcVal = "0"; } }
-
-    // BG
-    const canvas = document.getElementById('neural-canvas');
-    const ctx = canvas.getContext('2d');
-    let dots = [];
+    const canvas = document.getElementById('neural-canvas'); const ctx = canvas.getContext('2d'); let dots = [];
     function res() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.onresize = res; res();
-    for(let i=0; i<60; i++) dots.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:(Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3});
-    function anim() { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle="rgba(150,150,150,0.15)"; dots.forEach(d=>{ d.x+=d.vx; d.y+=d.vy; if(d.x<0||d.x>canvas.width)d.vx*=-1; if(d.y<0||d.y>canvas.height)d.vy*=-1; ctx.beginPath(); ctx.arc(d.x,d.y,1.5,0,Math.PI*2); ctx.fill(); }); requestAnimationFrame(anim); }
+    for(let i=0; i<40; i++) dots.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:(Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3});
+    function anim() { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle="rgba(150,150,150,0.15)"; dots.forEach(d=>{ d.x+=d.vx; d.y+=d.vy; if(d.x<0||d.x>canvas.width)d.vx*=-1; if(d.y<0||d.y>canvas.height)d.vy*=-1; ctx.beginPath(); ctx.arc(d.x,d.y,1.2,0,Math.PI*2); ctx.fill(); }); requestAnimationFrame(anim); }
     anim();
 </script>
 </body>
